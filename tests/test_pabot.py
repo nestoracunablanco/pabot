@@ -15,8 +15,8 @@ from robot import __version__ as ROBOT_VERSION
 
 s = execution_items.SuiteItem
 t = execution_items.TestItem
-datasource_hash = "8bd7e5d3de0bf878df17c338ce72a5ab27575050"
-file_hash = "19488a6a4a95f5ecb935ef87e07df9d10d81e3c0"
+datasource_hash = "9c707ad1d39fe54855f32087051bf57d9ffaae09"
+file_hash = "3b7ca9d1b392a18289c3cf0c7ebcca3175d24b1f"
 
 
 class PabotTests(unittest.TestCase):
@@ -26,12 +26,12 @@ class PabotTests(unittest.TestCase):
                 "--pabotlib",
                 "--verbose",
                 "--argumentfile1",
-                "tests/passingarg.txt",
+                "passingarg.txt",
                 "--argumentfile2",
-                "tests/failingarg.txt",
+                "failingarg.txt",
                 "--resourcefile",
-                "tests/valueset.dat",
-                "tests/fixtures",
+                "valueset.dat",
+                "fixtures",
             ]
         )
         self._outs_dir = pabot._output_dir(self._options)
@@ -98,7 +98,7 @@ class PabotTests(unittest.TestCase):
                 "--argumentfile2",
                 "argfile2.txt",
                 "-A",
-                "tests/arguments.arg",
+                "arguments.arg",
                 "suite",
             ]
         )
@@ -264,7 +264,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "2543f14f62afd037bd3958bb719656fc315cbc9d",
+            "6c20278178968b770eb821ea8959f91c6de55e8d",
             "--suite Fixtures",
         )
         with open(".pabotsuitenames", "r") as f:
@@ -443,7 +443,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "2e667c32eb50b41dffd9f3d97a5c3f442b52a1ca",
+            "5f8550fcb8c446fb8bc6f211d0cdf2c09f72431a",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -475,7 +475,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "2e667c32eb50b41dffd9f3d97a5c3f442b52a1ca",
+            "5f8550fcb8c446fb8bc6f211d0cdf2c09f72431a",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -519,7 +519,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "9bfb1cffcc5fe8b0dfa2ee5a1587655d5da00f53",
+            "00369072b8d7bc7498bfa758c0faad234436aed9",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -561,7 +561,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "7beb0f073adfba9b7c36db527e65b3bdb3d14001",
+            "12ea21a1ae6fe8c912f571e924b0b96988352d68",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -572,7 +572,7 @@ class PabotTests(unittest.TestCase):
         if os.path.isfile(".pabotsuitenames"):
             os.remove(".pabotsuitenames")
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = "output.xml"
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -587,7 +587,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "03b4e1ff17f3a3e4a7f5c6a1b3c480956bbd83d5",
+            "72df810c2aa27674119e1e807c7c5f91e401ba5c",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -609,7 +609,7 @@ class PabotTests(unittest.TestCase):
         with open(".pabotsuitenames", "w") as f:
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = "output.xml"
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -624,7 +624,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "03b4e1ff17f3a3e4a7f5c6a1b3c480956bbd83d5",
+            "72df810c2aa27674119e1e807c7c5f91e401ba5c",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -649,7 +649,7 @@ class PabotTests(unittest.TestCase):
         with open(".pabotsuitenames", "w") as f:
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = "output.xml"
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -673,7 +673,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "e33ce1259a999afd6c09c190c717d4d98bf6d5be",
+            "238c89970c9fee9da6c0d85960b562e86e380b1e",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -700,7 +700,7 @@ class PabotTests(unittest.TestCase):
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
         pabot_args["suitesfrom"] = "tests/output.xml"
-        os.rename("tests/output.xml", "tests/output.xml.tmp")
+        os.rename("output.xml", "output.xml.tmp")
         try:
             suite_names = pabot.solve_suite_names(
                 outs_dir=self._outs_dir,
@@ -709,7 +709,7 @@ class PabotTests(unittest.TestCase):
                 pabot_args=pabot_args,
             )
         finally:
-            os.rename("tests/output.xml.tmp", "tests/output.xml")
+            os.rename("output.xml.tmp", "output.xml")
         self._assert_equal_names(
             [
                 [
@@ -727,7 +727,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-            "644c540a9c30544812b1f1170635d077806a2669",
+            "1c147ab10628c79341ae73e02a5906fd97bb02e4",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",

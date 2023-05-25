@@ -160,7 +160,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         vals = lib.acquire_value_set()
         self.assertIn(
@@ -183,7 +183,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_disable_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         vals = lib.acquire_value_set()
         self.assertIn(
@@ -246,7 +246,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset_with_shared_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         vals = lib.acquire_value_set("commontag")
         self.assertIn(vals, ["TestSystemWithLasers", "TestSystemWithTachyonCannon"])
