@@ -13,10 +13,12 @@ from robot.utils import PY2
 from robot.errors import DataError
 from robot import __version__ as ROBOT_VERSION
 
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 s = execution_items.SuiteItem
 t = execution_items.TestItem
-datasource_hash = "9c707ad1d39fe54855f32087051bf57d9ffaae09"
-file_hash = "3b7ca9d1b392a18289c3cf0c7ebcca3175d24b1f"
+datasource_hash = "12e7fa6a8c00288b89b79d63278afeeab4f87145"
+file_hash = "be8de7a35c0ac961a68836a2b3c3545da9061e89"
 
 
 class PabotTests(unittest.TestCase):
@@ -26,12 +28,12 @@ class PabotTests(unittest.TestCase):
                 "--pabotlib",
                 "--verbose",
                 "--argumentfile1",
-                "passingarg.txt",
+                dir_path + "/passingarg.txt",
                 "--argumentfile2",
-                "failingarg.txt",
+                dir_path + "/failingarg.txt",
                 "--resourcefile",
-                "valueset.dat",
-                "fixtures",
+                dir_path + "/valueset.dat",
+                dir_path + "/fixtures",
             ]
         )
         self._outs_dir = pabot._output_dir(self._options)
@@ -78,13 +80,13 @@ class PabotTests(unittest.TestCase):
         ) = arguments.parse_args(
             [
                 "--command",
-                "my_own_command.sh",
+                dir_path + "/my_own_command.sh",
                 "--end-command",
                 "--processes",
                 "12",
                 "--verbose",
                 "--resourcefile",
-                "resourcefile.ini",
+                dir_path + "/resourcefile.ini",
                 "--testlevelsplit",
                 "--pabotlib",
                 "--pabotlibhost",
@@ -92,30 +94,30 @@ class PabotTests(unittest.TestCase):
                 "--pabotlibport",
                 "4562",
                 "--suitesfrom",
-                "some.xml",
+                dir_path + "/some.xml",
                 "--argumentfile1",
-                "argfile1.txt",
+                dir_path + "/argfile1.txt",
                 "--argumentfile2",
-                "argfile2.txt",
+                dir_path + "/argfile2.txt",
                 "-A",
-                "arguments.arg",
-                "suite",
+                dir_path + "/arguments.arg",
+                dir_path + "/suite",
             ]
         )
-        self.assertEqual(pabot_args["command"], ["my_own_command.sh"])
+        self.assertEqual(pabot_args["command"], [dir_path + "/my_own_command.sh"])
         self.assertEqual(pabot_args["processes"], 12)
-        self.assertEqual(pabot_args["resourcefile"], "resourcefile.ini")
+        self.assertEqual(pabot_args["resourcefile"], dir_path + "/resourcefile.ini")
         self.assertEqual(pabot_args["pabotlib"], True)
         self.assertEqual(pabot_args["pabotlibhost"], "123.123.233.123")
         self.assertEqual(pabot_args["pabotlibport"], 4562)
-        self.assertEqual(pabot_args["suitesfrom"], "some.xml")
+        self.assertEqual(pabot_args["suitesfrom"], dir_path + "/some.xml")
         self.assertEqual(
-            pabot_args["argumentfiles"], [("1", "argfile1.txt"), ("2", "argfile2.txt")]
+            pabot_args["argumentfiles"], [("1", dir_path + "/argfile1.txt"), ("2", dir_path + "/argfile2.txt")]
         )
         self.assertEqual(options["outputdir"], "myoutputdir")
         self.assertFalse("outputdir" in options_for_subprocesses)
         self.assertTrue(pabot_args["testlevelsplit"])
-        self.assertEqual(datasources, ["suite"])
+        self.assertEqual(datasources, [dir_path + "/suite"])
 
     def test_start_and_stop_remote_library(self):
         lib_process = pabot._start_remote_library(self._pabot_args)
@@ -264,7 +266,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "6c20278178968b770eb821ea8959f91c6de55e8d",
+            "a4f3da08790e60be67539d95a5fcd0159ae2dce3",
             "--suite Fixtures",
         )
         with open(".pabotsuitenames", "r") as f:
@@ -443,7 +445,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "5f8550fcb8c446fb8bc6f211d0cdf2c09f72431a",
+            "365c5870e3a0750fe25b32b3d4b45a23cb1e3d33",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -475,7 +477,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "5f8550fcb8c446fb8bc6f211d0cdf2c09f72431a",
+            "365c5870e3a0750fe25b32b3d4b45a23cb1e3d33",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -519,7 +521,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "00369072b8d7bc7498bfa758c0faad234436aed9",
+            "b78c7fea28fe3d048f14be173d8f511e96d6fef1",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -561,7 +563,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "12ea21a1ae6fe8c912f571e924b0b96988352d68",
+            "19b752682b36f66c5fc44e5b5f6eaab7c123f8a5",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -587,7 +589,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "72df810c2aa27674119e1e807c7c5f91e401ba5c",
+            "de9ccda60b1ba3995ca222951f6162b96ea38c92",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -624,7 +626,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "72df810c2aa27674119e1e807c7c5f91e401ba5c",
+            "de9ccda60b1ba3995ca222951f6162b96ea38c92",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -673,7 +675,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "238c89970c9fee9da6c0d85960b562e86e380b1e",
+            "f7a0d011530d45e94664756f7a27b701c2ccfcdb",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -727,7 +729,7 @@ class PabotTests(unittest.TestCase):
             datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-            "1c147ab10628c79341ae73e02a5906fd97bb02e4",
+            "6c201b8d673bb34f4d5d6ad97bdad1055825aa16",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",

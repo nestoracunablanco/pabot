@@ -24,9 +24,9 @@ class ResultMergerTests(unittest.TestCase):
     def test_test_level_run_merge(self):
         result = result_merger.merge(
             [
-                "tests/outputs/first.xml",
-                "tests/outputs/second.xml",
-                "tests/outputs/third.xml",
+                "outputs/first.xml",
+                "outputs/second.xml",
+                "outputs/third.xml",
             ],
             {},
             "root",
@@ -41,7 +41,7 @@ class ResultMergerTests(unittest.TestCase):
 
     def test_suite_level_run_merge(self):
         result = result_merger.merge(
-            ["tests/outputs/tests.xml", "tests/outputs/tests2.xml"], {}, "root", []
+            ["outputs/tests.xml", "outputs/tests2.xml"], {}, "root", []
         )
         visitor = ResultStats()
         result.visit(visitor)

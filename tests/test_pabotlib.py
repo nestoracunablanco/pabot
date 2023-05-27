@@ -230,7 +230,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset_with_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         vals = lib.acquire_value_set("laser")
         self.assertEqual(vals, "TestSystemWithLasers")
@@ -257,7 +257,7 @@ class PabotLibTests(unittest.TestCase):
     def test_reacquire_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         lib.acquire_value_set()
         try:
@@ -271,7 +271,7 @@ class PabotLibTests(unittest.TestCase):
     def test_trying_to_acquire_valueset_with_none_existing_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=os.path.join("resourcefile.dat")
         )
         try:
             lib.acquire_value_set("none-existing-tag")
