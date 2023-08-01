@@ -15,6 +15,9 @@ class PabotLibTests(unittest.TestCase):
         builtinmock = lambda: 0
         builtinmock.get_variable_value = lambda *args: None
         self._runs = 0
+        self.tests_dir = os.path.dirname(os.path.abspath(__file__))
+        self.tests_data_dir = os.path.join(self.tests_dir, "data")
+        self.resource_file_dat = os.path.join(self.tests_data_dir, "resourcefile.dat")
 
         def runned(*args):
             self._runs += 1
@@ -160,7 +163,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         vals = lib.acquire_value_set()
         self.assertIn(
@@ -183,7 +186,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_disable_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         vals = lib.acquire_value_set()
         self.assertIn(
@@ -230,7 +233,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset_with_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         vals = lib.acquire_value_set("laser")
         self.assertEqual(vals, "TestSystemWithLasers")
@@ -246,7 +249,7 @@ class PabotLibTests(unittest.TestCase):
     def test_acquire_and_release_valueset_with_shared_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         vals = lib.acquire_value_set("commontag")
         self.assertIn(vals, ["TestSystemWithLasers", "TestSystemWithTachyonCannon"])
@@ -257,7 +260,7 @@ class PabotLibTests(unittest.TestCase):
     def test_reacquire_valueset(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         lib.acquire_value_set()
         try:
@@ -271,7 +274,7 @@ class PabotLibTests(unittest.TestCase):
     def test_trying_to_acquire_valueset_with_none_existing_tag(self):
         lib = pabotlib.PabotLib()
         lib._values = lib._parse_values(
-            resourcefile=os.path.join("tests", "resourcefile.dat")
+            resourcefile=self.resource_file_dat
         )
         try:
             lib.acquire_value_set("none-existing-tag")

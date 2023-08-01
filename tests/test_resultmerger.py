@@ -1,11 +1,9 @@
 import unittest
-import time
 import os
-import tempfile
-import shutil
-import random
 import pabot.result_merger as result_merger
 from robot.result.visitor import ResultVisitor
+
+from test_base import TestBase
 
 
 class ResultStats(ResultVisitor):
@@ -20,13 +18,17 @@ class ResultStats(ResultVisitor):
         self.suites.append(suite.longname)
 
 
-class ResultMergerTests(unittest.TestCase):
+class ResultMergerTests(TestBase):
+
+    def setUp(self):
+        super(ResultMergerTests, self).setUp()
+
     def test_test_level_run_merge(self):
         result = result_merger.merge(
             [
-                "tests/outputs/first.xml",
-                "tests/outputs/second.xml",
-                "tests/outputs/third.xml",
+                os.path.join(self.tests_outputs_dir, "first.xml"),
+                os.path.join(self.tests_outputs_dir, "second.xml"),
+                os.path.join(self.tests_outputs_dir, "third.xml"),
             ],
             {},
             "root",
@@ -41,7 +43,7 @@ class ResultMergerTests(unittest.TestCase):
 
     def test_suite_level_run_merge(self):
         result = result_merger.merge(
-            ["tests/outputs/tests.xml", "tests/outputs/tests2.xml"], {}, "root", []
+            [os.path.join(self.tests_outputs_dir, "tests.xml"), os.path.join(self.tests_outputs_dir, "tests2.xml")], {}, "root", []
         )
         visitor = ResultStats()
         result.visit(visitor)

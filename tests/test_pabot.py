@@ -13,25 +13,27 @@ from robot.utils import PY2
 from robot.errors import DataError
 from robot import __version__ as ROBOT_VERSION
 
-s = execution_items.SuiteItem
-t = execution_items.TestItem
-datasource_hash = "8bd7e5d3de0bf878df17c338ce72a5ab27575050"
-file_hash = "19488a6a4a95f5ecb935ef87e07df9d10d81e3c0"
+from test_base import TestBase
 
 
-class PabotTests(unittest.TestCase):
+class PabotTests(TestBase):
     def setUp(self):
+        super(PabotTests, self).setUp()
+        self.s = execution_items.SuiteItem
+        self.t = execution_items.TestItem
+        self.datasource_hash = "f73e12ab0888aee685520429f6bf44f52798be62"
+        self.file_hash = "8cdfbbfc0c51a96479e701e6df24aad00c666c40"
         self._options, self._datasources, self._pabot_args, _ = arguments.parse_args(
             [
                 "--pabotlib",
                 "--verbose",
                 "--argumentfile1",
-                "tests/passingarg.txt",
+                os.path.join(self.tests_data_dir, "passingarg.txt"),
                 "--argumentfile2",
-                "tests/failingarg.txt",
+                os.path.join(self.tests_data_dir, "failingarg.txt"),
                 "--resourcefile",
-                "tests/valueset.dat",
-                "tests/fixtures",
+                os.path.join(self.tests_data_dir, "valueset.dat"),
+                self.tests_fixtures_dir,
             ]
         )
         self._outs_dir = pabot._output_dir(self._options)
@@ -98,7 +100,7 @@ class PabotTests(unittest.TestCase):
                 "--argumentfile2",
                 "argfile2.txt",
                 "-A",
-                "tests/arguments.arg",
+                os.path.join(self.tests_data_dir, "arguments.arg"),
                 "suite",
             ]
         )
@@ -154,11 +156,10 @@ class PabotTests(unittest.TestCase):
         self.assertNotEqual(h6, h7)
 
     def test_hash_of_dirs(self):
-        test_dir = os.path.join(os.path.dirname(__file__), "fixtures")
-        h1 = pabot.get_hash_of_dirs([test_dir])
-        h2 = pabot.get_hash_of_dirs([test_dir, test_dir])
+        h1 = pabot.get_hash_of_dirs([self.tests_fixtures_dir])
+        h2 = pabot.get_hash_of_dirs([self.tests_fixtures_dir, self.tests_fixtures_dir])
         self.assertNotEqual(h1, h2)
-        h3 = pabot.get_hash_of_dirs([os.path.join(test_dir, "suite_one.robot")])
+        h3 = pabot.get_hash_of_dirs([os.path.join(self.tests_fixtures_dir, "suite_one.robot")])
         self.assertNotEqual(h1, h3)
         self.assertNotEqual(h2, h3)
         h4 = pabot.get_hash_of_dirs(
@@ -171,27 +172,27 @@ class PabotTests(unittest.TestCase):
     def test_file_hash(self):
         h1 = pabot._file_hash(
             [
-                "datasources:" + datasource_hash,
+                "datasources:" + self.datasource_hash,
                 "commandlineoptions:97d170e1550eee4afc0af065b78cda302a97674c",
                 "suitesfrom:no-suites-from-option",
-                "file:" + file_hash,
+                "file:" + self.file_hash,
             ]
             + self._all_with_suites
         )
-        self.assertEqual(h1, file_hash)
+        self.assertEqual(self.file_hash, h1)
         h2 = pabot._file_hash(
             [
-                "datasources:" + datasource_hash,
+                "datasources:" + self.datasource_hash,
                 "commandlineoptions:97d170e1550eee4afc0af065b78cda302a97674c",
                 "suitesfrom:no-suites-from-option",
-                "file:" + file_hash,
+                "file:" + self.file_hash,
             ]
             + list(reversed(self._all_with_suites))
         )
         self.assertEqual(h1, h2)
         h3 = pabot._file_hash(
             [
-                "datasources:" + datasource_hash,
+                "datasources:" + self.datasource_hash,
                 "commandlineoptions:97d170e1550eee4afc0af065b78cda302a97674c",
                 "suitesfrom:no-suites-from-option",
                 "file:whatever",
@@ -225,10 +226,10 @@ class PabotTests(unittest.TestCase):
         self._assert_equal_names([self._all_suites], suite_names)
         self.assertTrue(os.path.isfile(".pabotsuitenames"))
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             *self._all_with_suites
         )
         with open(".pabotsuitenames", "r") as f:
@@ -245,7 +246,7 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_works_with_directory_suite(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "some-wrong-stuff",
             "no-suites-from-option",
             "this-is-wrong",
@@ -261,10 +262,10 @@ class PabotTests(unittest.TestCase):
         )
         self._assert_equal_names([["Fixtures"]], suite_names)
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "2543f14f62afd037bd3958bb719656fc315cbc9d",
+            "23c390f636ef1c714517e9d9282f2704ab1354df",
             "--suite Fixtures",
         )
         with open(".pabotsuitenames", "r") as f:
@@ -281,7 +282,7 @@ class PabotTests(unittest.TestCase):
             return execution_items.GroupStartItem()
         if name == "}":
             return execution_items.GroupEndItem()
-        return s(name)
+        return self.s(name)
 
     def _test_preserve_order(self, expected, new_suites, old_suites):
         self.assertEqual(
@@ -377,7 +378,7 @@ class PabotTests(unittest.TestCase):
         self._test_preserve_order(["a"], ["a"], ["a", "a"])
 
     def test_test_item_name_replaces_pattern_chars(self):
-        item = t("Test [WITH] *funny* name?")
+        item = self.t("Test [WITH] *funny* name?")
         opts = {}
         item.modify_options_for_executor(opts)
         if ROBOT_VERSION >= "3.1":
@@ -386,45 +387,45 @@ class PabotTests(unittest.TestCase):
             self.assertEqual(opts["test"], "Test [WITH] *funny* name?")
 
     def test_test_item_removes_rerunfailed_option(self):
-        item = t("Some test")
+        item = self.t("Some test")
         opts = {"rerunfailed": []}
         item.modify_options_for_executor(opts)
         self.assertTrue("rerunfailed" not in opts)
 
     def test_fix_items_splits_to_tests_when_suite_after_test_from_that_suite(self):
-        expected_items = [t("s.t1"), t("s.t2")]
-        items = [t("s.t1"), s("s", tests=["s.t1", "s.t2"])]
+        expected_items = [self.t("s.t1"), self.t("s.t2")]
+        items = [self.t("s.t1"), self.s("s", tests=["s.t1", "s.t2"])]
         self.assertEqual(expected_items, pabot._fix_items(items))
 
     def test_fix_items_combines_to_suite_when_test_from_suite_after_suite(self):
-        expected_items = [s("s", tests=["s.t1", "s.t2"])]
-        items = [s("s", tests=["s.t1", "s.t2"]), t("s.t1")]
+        expected_items = [self.s("s", tests=["s.t1", "s.t2"])]
+        items = [self.s("s", tests=["s.t1", "s.t2"]), self.t("s.t1")]
         self.assertEqual(expected_items, pabot._fix_items(items))
 
     def test_fix_items_combines_subsuites_when_after_containing_suite(self):
-        self.assertEqual([s("s")], pabot._fix_items([s("s"), s("s.s1")]))
+        self.assertEqual([self.s("s")], pabot._fix_items([self.s("s"), self.s("s.s1")]))
 
     def test_fix_items_split_containig_suite_when_subsuite_before(self):
         self.assertEqual(
-            [s("s.s1"), s("s.s2")],
-            pabot._fix_items([s("s.s1"), s("s", suites=["s.s1", "s.s2"])]),
+            [self.s("s.s1"), self.s("s.s2")],
+            pabot._fix_items([self.s("s.s1"), self.s("s", suites=["s.s1", "s.s2"])]),
         )
 
     def test_fix_items_removes_duplicates(self):
-        self.assertEqual([t("t")], pabot._fix_items([t("t"), t("t")]))
-        self.assertEqual([s("s")], pabot._fix_items([s("s"), s("s")]))
+        self.assertEqual([self.t("t")], pabot._fix_items([self.t("t"), self.t("t")]))
+        self.assertEqual([self.s("s")], pabot._fix_items([self.s("s"), self.s("s")]))
 
     def test_fix_works_with_waits(self):
         w = execution_items.WaitItem
         self.assertEqual([], pabot._fix_items([w()]))
         self.assertEqual([], pabot._fix_items([w(), w()]))
-        self.assertEqual([s("s")], pabot._fix_items([w(), s("s")]))
-        self.assertEqual([s("s")], pabot._fix_items([s("s"), w()]))
+        self.assertEqual([self.s("s")], pabot._fix_items([w(), self.s("s")]))
+        self.assertEqual([self.s("s")], pabot._fix_items([self.s("s"), w()]))
         self.assertEqual(
-            [s("s1"), w(), s("s2")], pabot._fix_items([s("s1"), w(), s("s2")])
+            [self.s("s1"), w(), self.s("s2")], pabot._fix_items([self.s("s1"), w(), self.s("s2")])
         )
         self.assertEqual(
-            [s("s1"), w(), s("s2")], pabot._fix_items([s("s1"), w(), w(), s("s2")])
+            [self.s("s1"), w(), self.s("s2")], pabot._fix_items([self.s("s1"), w(), w(), self.s("s2")])
         )
 
     def test_solve_suite_names_with_testlevelsplit_option(self):
@@ -440,10 +441,10 @@ class PabotTests(unittest.TestCase):
         )
         self._assert_equal_names([self._all_tests], test_names)
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "2e667c32eb50b41dffd9f3d97a5c3f442b52a1ca",
+            "d0a3ffd71b3c745129752356b52082951ad18ddd",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -454,10 +455,10 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_with_testlevelsplit_option_added(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             *self._all_with_suites
         )
         with open(".pabotsuitenames", "w") as f:
@@ -472,10 +473,10 @@ class PabotTests(unittest.TestCase):
         )
         self._assert_equal_names([self._all_tests], test_names)
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "2e667c32eb50b41dffd9f3d97a5c3f442b52a1ca",
+            "d0a3ffd71b3c745129752356b52082951ad18ddd",
             *self._all_with_tests
         )
         with pabot._open_pabotsuitenames("r") as f:
@@ -498,7 +499,7 @@ class PabotTests(unittest.TestCase):
         all_with = all_with_suites + all_with_tests
         all_names = all_suites + all_tests
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
             "1ac0e4ebf55ba472c813b5ac9f8d870dfbd97756",
@@ -516,10 +517,10 @@ class PabotTests(unittest.TestCase):
         )
         self._assert_equal_names([all_names], test_names)
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
-            "9bfb1cffcc5fe8b0dfa2ee5a1587655d5da00f53",
+            "db9f8a3bbc7c2a89ad3703876a3f0564583f84fc",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -540,7 +541,7 @@ class PabotTests(unittest.TestCase):
         all_with = all_with_suites + all_with_tests
         all_names = all_suites + all_tests
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
             "c08124c3319cbb938d12ae5da81f83ab297f7c9f",
@@ -558,10 +559,10 @@ class PabotTests(unittest.TestCase):
         )
         self._assert_equal_names([all_names], test_names)
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            "7beb0f073adfba9b7c36db527e65b3bdb3d14001",
+            "39997a24bc83cae22db5afbccb638e8c93298084",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -572,7 +573,7 @@ class PabotTests(unittest.TestCase):
         if os.path.isfile(".pabotsuitenames"):
             os.remove(".pabotsuitenames")
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = self.output_xml
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -584,10 +585,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "03b4e1ff17f3a3e4a7f5c6a1b3c480956bbd83d5",
+            "f479b3e56716a00d25fc468a647bf161d5d0091e",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -598,7 +599,7 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_works_when_suitesfrom_file_added(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
             "c06f2afdfa35791e82e71618bf60415e927c41ae",
@@ -609,7 +610,7 @@ class PabotTests(unittest.TestCase):
         with open(".pabotsuitenames", "w") as f:
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = self.output_xml
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -621,10 +622,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "03b4e1ff17f3a3e4a7f5c6a1b3c480956bbd83d5",
+            "f479b3e56716a00d25fc468a647bf161d5d0091e",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -649,7 +650,7 @@ class PabotTests(unittest.TestCase):
         with open(".pabotsuitenames", "w") as f:
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
+        pabot_args["suitesfrom"] = self.output_xml
         suite_names = pabot.solve_suite_names(
             outs_dir=self._outs_dir,
             datasources=self._datasources,
@@ -670,10 +671,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
-            "e33ce1259a999afd6c09c190c717d4d98bf6d5be",
+            "aa8fc7028246324ca95b77e96a70fa9ef08d8d1d",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -687,7 +688,7 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_works_after_suitesfrom_file_removed(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "f57c1949d5137773e0b9f6ca34c439a27a22bcb0",
             "50d0c83b3c6b35ddc81c3289f5591d6574412c17",
@@ -699,8 +700,9 @@ class PabotTests(unittest.TestCase):
         with open(".pabotsuitenames", "w") as f:
             f.writelines(pabotsuitenames)
         pabot_args = dict(self._pabot_args)
-        pabot_args["suitesfrom"] = "tests/output.xml"
-        os.rename("tests/output.xml", "tests/output.xml.tmp")
+        output_xml_tmp = os.path.join(self.tests_data_dir, "output.xml.tmp")
+        pabot_args["suitesfrom"] = self.output_xml
+        os.rename(self.output_xml, output_xml_tmp)
         try:
             suite_names = pabot.solve_suite_names(
                 outs_dir=self._outs_dir,
@@ -709,7 +711,7 @@ class PabotTests(unittest.TestCase):
                 pabot_args=pabot_args,
             )
         finally:
-            os.rename("tests/output.xml.tmp", "tests/output.xml")
+            os.rename(output_xml_tmp, self.output_xml)
         self._assert_equal_names(
             [
                 [
@@ -724,10 +726,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-            "644c540a9c30544812b1f1170635d077806a2669",
+            "fd91bd4f8bf95f70329dbe60c376d37e4f704ec2",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
             "--suite Fixtures.Suite Special",
@@ -741,10 +743,10 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_works_with_pabotsuitenames_file(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
@@ -781,10 +783,10 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_file_is_not_changed_when_invalid_cli_opts(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
@@ -808,7 +810,7 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_transforms_old_suite_names_to_new_format(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
             "c65865c6eac504bddb6bd3f8ddeb18bd49b53c37",
@@ -841,10 +843,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite One",
@@ -858,10 +860,10 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_works_with_pabotsuitenames_file_with_wait_command(self):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "#WAIT",
             "--suite Fixtures.Suite Second",
@@ -908,10 +910,10 @@ class PabotTests(unittest.TestCase):
         self,
     ):
         pabotsuitenames = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "old-command-line-options",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "#WAIT",
             "--suite Fixtures.Suite Second",
@@ -943,10 +945,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "#WAIT",
             "--suite Fixtures.Suite Second",
@@ -961,7 +963,7 @@ class PabotTests(unittest.TestCase):
 
     def test_solve_suite_names_with_corrupted_pabotsuitenames_file(self):
         pabotsuitenames_corrupted = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
             "4f2fc7af25040e0f3b9e2681b84594ccb0cdf9e",
@@ -994,10 +996,10 @@ class PabotTests(unittest.TestCase):
             suite_names,
         )
         expected = self._psuitenames(
-            datasource_hash,
+            self.datasource_hash,
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
-            file_hash,
+            self.file_hash,
             "--suite Fixtures.Suite Special",
             "--suite Fixtures.Suite Second",
             "--suite Fixtures.Suite With Valueset Tags",
@@ -1074,7 +1076,7 @@ class PabotTests(unittest.TestCase):
         lib_process = pabot._start_remote_library(self._pabot_args)
         pabot._initialize_queue_index()
         try:
-            suite_names = [s(_s) for _s in self._all_suites]
+            suite_names = [self.s(_s) for _s in self._all_suites]
             items = [
                 pabot.QueueItem(
                     self._datasources,
@@ -1117,7 +1119,7 @@ class PabotTests(unittest.TestCase):
         lib_process = pabot._start_remote_library(self._pabot_args)
         pabot._initialize_queue_index()
         try:
-            test_names = [t(_t) for _t in self._all_tests]
+            test_names = [self.t(_t) for _t in self._all_tests]
             items = [
                 pabot.QueueItem(
                     self._datasources,
@@ -1153,7 +1155,7 @@ class PabotTests(unittest.TestCase):
 
     def test_suite_root_name(self):
         def t(l):
-            return [[s(i) for i in suites] for suites in l]
+            return [[self.s(i) for i in suites] for suites in l]
 
         self.assertEqual(
             pabot._get_suite_root_name(t([["Foo.Bar", "Foo.Zoo"], ["Foo.Boo"]])), "Foo"
