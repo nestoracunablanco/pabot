@@ -15,6 +15,8 @@ from robot import __version__ as ROBOT_VERSION
 
 from test_base import TestBase
 
+# TODO: It looks like the hashes are computed based on the folder, and not on the filename or project relative path
+# This will cause issues always we want to run the tests
 
 class PabotTests(TestBase):
     def setUp(self):
@@ -22,7 +24,9 @@ class PabotTests(TestBase):
         self.s = execution_items.SuiteItem
         self.t = execution_items.TestItem
         self.datasource_hash = "f73e12ab0888aee685520429f6bf44f52798be62"
+        #self.datasource_hash = "ae943b1a83659fc2bce3cbd009f5557a8e06525d"
         self.file_hash = "8cdfbbfc0c51a96479e701e6df24aad00c666c40"
+        #self.file_hash = "c899af332b44df811bad1b11cd915415e2578d9a"
         self._options, self._datasources, self._pabot_args, _ = arguments.parse_args(
             [
                 "--pabotlib",
@@ -521,6 +525,7 @@ class PabotTests(TestBase):
             "65f95c924ba97541f47949701c4e3c51192a5b43",
             "no-suites-from-option",
             "db9f8a3bbc7c2a89ad3703876a3f0564583f84fc",
+            #"18b19fc23427ac94ff1c4bb595cd287ce8895499",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
@@ -563,6 +568,7 @@ class PabotTests(TestBase):
             "97d170e1550eee4afc0af065b78cda302a97674c",
             "no-suites-from-option",
             "39997a24bc83cae22db5afbccb638e8c93298084",
+            #"2742b1c9e81afc3e8c090ea516d86baf3dc19b05",
             *all_with
         )
         with open(".pabotsuitenames", "r") as f:
